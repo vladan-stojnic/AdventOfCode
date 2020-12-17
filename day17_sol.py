@@ -45,44 +45,32 @@ def get_all_neighbors_to_check(state):
 
     return neighbors
 
+def play_game(current_state, num_turns=6):
+    for play in range(num_turns):
+
+        neighbors_to_check = get_all_neighbors_to_check(current_state)
+        new_state = set()
+
+        for neighbor in neighbors_to_check:
+            if neighbor in current_state:
+                if 3 <= get_num_active(neighbor, current_state) <= 4:
+                    new_state.add(neighbor)
+            else:
+                if get_num_active(neighbor, current_state) == 3:
+                    new_state.add(neighbor)
+
+        current_state = copy.deepcopy(new_state)
+
+    return len(current_state)
+
 # Part 1
 
 current_state = read_input('day17')
 
-for play in range(6):
-
-    neighbors_to_check = get_all_neighbors_to_check(current_state)
-    new_state = set()
-
-    for neighbor in neighbors_to_check:
-        if neighbor in current_state:
-            if 3 <= get_num_active(neighbor, current_state) <= 4:
-                new_state.add(neighbor)
-        else:
-            if get_num_active(neighbor, current_state) == 3:
-                new_state.add(neighbor)
-
-    current_state = copy.deepcopy(new_state)
-
-print(len(current_state))
+print(play_game(current_state))
 
 # Part 2
 
 current_state = read_input('day17', dimension=4)
 
-for play in range(6):
-
-    neighbors_to_check = get_all_neighbors_to_check(current_state)
-    new_state = set()
-
-    for neighbor in neighbors_to_check:
-        if neighbor in current_state:
-            if 3 <= get_num_active(neighbor, current_state) <= 4:
-                new_state.add(neighbor)
-        else:
-            if get_num_active(neighbor, current_state) == 3:
-                new_state.add(neighbor)
-
-    current_state = copy.deepcopy(new_state)
-
-print(len(current_state))
+print(play_game(current_state))
