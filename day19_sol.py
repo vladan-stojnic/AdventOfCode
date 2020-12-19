@@ -5,7 +5,7 @@ def read_input(path, dimension=3):
         data = f.read()
     data = data.split('\n\n')
 
-    rules = {int(line.split(':')[0]): line.split(':')[1].strip() for line in data[0].splitlines()}
+    rules = {int(line.split(':')[0]): ' '+line.split(':')[1].strip()+' ' for line in data[0].splitlines()}
 
     completed = set()
     to_use = []
@@ -18,26 +18,17 @@ def read_input(path, dimension=3):
             rules[key] = '('+value.replace('"', '')+')'
 
     while len(completed) != len(rules):
-        #print(to_use, set(rules).difference(set(completed)))
         use = to_use.pop(0)
         val = rules[use]
 
-        exp_to_find = re.compile(r'^'+str(use)+' | '+str(use)+' | '+str(use)+'$|^'+str(use)+'$')
+        exp_to_find = re.compile(r'\b'+str(use)+r'\b')
         for key, value in rules.items():
             if exp_to_find.search(value):
-                f1 = re.compile('^'+str(use)+' ')
-                rules[key] = f1.sub(val+' ', rules[key])
-                f2 = re.compile(' '+str(use)+' ')
-                rules[key] = f2.sub(' ' + val + ' ', rules[key])
-                f3 = re.compile(' '+str(use)+'$')
-                rules[key] = f3.sub(' '+val, rules[key])
-                f4 = re.compile('^'+str(use)+'$')
-                rules[key] = f4.sub(val, rules[key])
-                #print('Match: ', key, rules[key])
+                rules[key] = exp_to_find.sub(val, rules[key])
                 if not digits.search(rules[key]):
                     completed.add(key)
                     to_use.append(key)
-                    rules[key] = '('+rules[key].replace('"', '')+')'
+                    rules[key] = ' ('+rules[key].replace('"', '')+') '
 
     for key, value in rules.items():
         rules[key] = value.replace(' ', '')
