@@ -32,7 +32,7 @@ def simulate_step(state):
         for i, j in flashed_indices:
             new_state[
                 max(0, i - 1) : min(new_state.shape[0], i + 2),
-                max(0, j - 1) : min(new_state.shape[0], j + 2),
+                max(0, j - 1) : min(new_state.shape[1], j + 2),
             ] += 1
 
         old_flashed = flashed
