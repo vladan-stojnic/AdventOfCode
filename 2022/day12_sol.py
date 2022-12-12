@@ -65,41 +65,58 @@ def parse_data(data):
     return np.array(transformed_data), start_loc, end_loc
 
 
-def get_neighbors(data, loc):
+def get_neighbors(data, loc, reverse=False):
     i, j = loc
     val = data[i, j]
     valid_neighbors = []
 
     if i - 1 >= 0:
         n_val = data[i - 1, j]
-        if n_val <= val + 1:
-            valid_neighbors.append(((i - 1, j), n_val))
+        if not reverse:
+            if n_val <= val + 1:
+                valid_neighbors.append(((i - 1, j), n_val))
+        else:
+            if n_val + 1 >= val:
+                valid_neighbors.append(((i - 1, j), n_val))
 
     if i + 1 < data.shape[0]:
         n_val = data[i + 1, j]
-        if n_val <= val + 1:
-            valid_neighbors.append(((i + 1, j), n_val))
+        if not reverse:
+            if n_val <= val + 1:
+                valid_neighbors.append(((i + 1, j), n_val))
+        else:
+            if n_val + 1 >= val:
+                valid_neighbors.append(((i + 1, j), n_val))
 
     if j - 1 >= 0:
         n_val = data[i, j - 1]
-        if n_val <= val + 1:
-            valid_neighbors.append(((i, j - 1), n_val))
+        if not reverse:
+            if n_val <= val + 1:
+                valid_neighbors.append(((i, j - 1), n_val))
+        else:
+            if n_val + 1 >= val:
+                valid_neighbors.append(((i, j - 1), n_val))
 
     if j + 1 < data.shape[1]:
         n_val = data[i, j + 1]
-        if n_val <= val + 1:
-            valid_neighbors.append(((i, j + 1), n_val))
+        if not reverse:
+            if n_val <= val + 1:
+                valid_neighbors.append(((i, j + 1), n_val))
+        else:
+            if n_val + 1 >= val:
+                valid_neighbors.append(((i, j + 1), n_val))
 
     return valid_neighbors
 
 
-def find_shortest_path(data, source, target):
+def find_shortest_path(data, source, target=None, reverse=False):
     dist = defaultdict(lambda: float("inf"))
-    steps = defaultdict(lambda: 0)
+    steps = defaultdict(lambda: float("inf"))
     pqueue = PriorityQueue()
 
     pqueue.push(source, 0)
     dist[source] = 0
+    steps[source] = 0
 
     while len(pqueue) != 0:
         u = pqueue.pop()
@@ -107,14 +124,14 @@ def find_shortest_path(data, source, target):
         if u == target:
             return steps[u]
 
-        for neighbor, n_val in get_neighbors(data, u):
+        for neighbor, n_val in get_neighbors(data, u, reverse):
             alt = dist[u] + n_val
             if alt < dist[neighbor]:
                 dist[neighbor] = alt
                 steps[neighbor] = steps[u] + 1
                 pqueue.push(neighbor, alt)
 
-    return float("inf")
+    return steps
 
 
 data = read_input("day12")
@@ -129,8 +146,6 @@ print(f"Path has a length of: {dist}")
 # Part 2
 possible_starts = list(zip(*np.where(grid == ord("a"))))
 
-path_distances = [
-    find_shortest_path(grid, s, end_loc) for s in possible_starts
-]
+dist = find_shortest_path(grid, end_loc, reverse=True)
 
-print(f"Shortest possible path: {min(path_distances)}")
+print(f"Shortest possible path: {min(dist[ps] for ps in possible_starts)}")
